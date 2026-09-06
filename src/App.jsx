@@ -79,8 +79,10 @@ function parseProdutos(arrayBuffer) {
 // acompanhou). Em vez de repassar tudo de uma vez, distribui o aumento em
 // etapas mensais, preservando a margem que os preços de hoje já consideram —
 // não a margem real de hoje, que já está mais apertada do que parece.
-function RepasseTab({ rbt12Raw, produtos, aliquotaUsadaRaw, setAliquotaUsadaRaw, mesesRaw, setMesesRaw }) {
-  const rbt12 = parseBR(rbt12Raw);
+function RepasseTab({ rbt12Raw, rbt12RealRaw, produtos, aliquotaUsadaRaw, setAliquotaUsadaRaw, mesesRaw, setMesesRaw }) {
+  const rbt12Declarado = parseBR(rbt12Raw);
+  const rbt12Real = parseBR(rbt12RealRaw);
+  const rbt12 = rbt12Real > 0 ? rbt12Real : rbt12Declarado;
   const aliquotaReal = useMemo(() => (rbt12 > 0 ? calcDasHoje(rbt12).aliqEf : 0), [rbt12]);
   const aliquotaUsada = parseBR(aliquotaUsadaRaw) / 100;
   const meses = Math.max(1, parseInt(mesesRaw, 10) || 0);
@@ -132,6 +134,11 @@ function RepasseTab({ rbt12Raw, produtos, aliquotaUsadaRaw, setAliquotaUsadaRaw,
           </label>
         </div>
         {rbt12 <= 0 && <p className="text-sm text-slate-400 italic mt-3">Informe o RBT12 na aba Simples Nacional primeiro.</p>}
+        {rbt12 > 0 && (
+          <p className="text-[11px] text-slate-400 mt-3">
+            Alíquota real calculada com base no RBT12 {rbt12Real > 0 ? 'real' : 'declarado'} ({fmtR(rbt12)}) informado na aba Simples Nacional.
+          </p>
+        )}
       </div>
 
       {temDados && (
@@ -1072,6 +1079,7 @@ export default function App() {
         {tab === 'repasse' && (
           <RepasseTab
             rbt12Raw={rbt12Raw}
+            rbt12RealRaw={rbt12RealRaw}
             produtos={produtos}
             aliquotaUsadaRaw={aliquotaUsadaRaw}
             setAliquotaUsadaRaw={setAliquotaUsadaRaw}
