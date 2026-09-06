@@ -1,0 +1,16 @@
+// Regras do Firestore — Precificador Reforma.
+// Cole isso no console do Firebase: Firestore Database > Regras > substituir
+// tudo por este conteúdo > Publicar.
+//
+// Ferramenta interna sem login — libera leitura/escrita geral na coleção
+// `produtos` (que já embute os custosExtras de cada produto). Se algum dia
+// isso for exposto publicamente ou precisar de multiusuário, trocar por
+// regras restritas a um usuário autenticado.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /produtos/{produtoId} {
+      allow read, write: if true;
+    }
+  }
+}
